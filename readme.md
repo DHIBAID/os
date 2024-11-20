@@ -17,7 +17,7 @@ This project is a simple operating system written in C. It aims to provide a bas
 ## Installation
 1. Clone the repository:
     ```sh
-    git clone https://github.com/yourusername/os-project.git
+    git clone https://github.com/DHIABID/os.git
     ```
 2. Navigate to the project directory:
     ```sh
