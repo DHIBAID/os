@@ -14,19 +14,5 @@ This project is a simple operating system written in C. It aims to provide a bas
 - Mtools
 - Mkfs.fat
 
-## Installation
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/DHIABID/os.git
-    ```
-2. Navigate to the project directory:
-    ```sh
-    cd os-project
-    ```
-3. Build the project:
-    ```sh
-    make
-    ```
-
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
