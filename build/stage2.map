@@ -1,0 +1,87 @@
+Open Watcom Linker Version 2.0 beta Nov 21 2024 02:22:14 (64-bit)
+Copyright (c) 2002-2024 The Open Watcom Contributors. All Rights Reserved.
+Portions Copyright (c) 1985-2002 Sybase, Inc. All Rights Reserved.
+Created on:       24/11/23 19:28:32
+Executable Image: /home/dhibaid/Documents/Code/C/os/build/stage2.bin
+creating a RAW Binary Image executable
+Error! E2028: _cstart_ is an undefined reference
+
+
+                        +------------+
+                        |   Groups   |
+                        +------------+
+
+Group                           Address              Size
+=====                           =======              ====
+
+DGROUP                          00000022             00000000
+
+
+
+                        +--------------+
+                        |   Segments   |
+                        +--------------+
+
+Segment                Class          Group          Address         Size
+=======                =====          =====          =======         ====
+
+_ENTRY                 CODE           AUTO           00000000        00000013
+_TEXT                  CODE           AUTO           00000013        0000000f
+CONST                  DATA           DGROUP         00000022        00000000
+CONST2                 DATA           DGROUP         00000022        00000000
+_DATA                  DATA           DGROUP         00000022        00000000
+
+
+                        +----------------+
+                        |   Memory Map   |
+                        +----------------+
+
+* = unreferenced symbol
++ = symbol only referenced locally
+
+Address        Symbol
+=======        ======
+
+Module: /home/dhibaid/Documents/Code/C/os/build/stage2/asm/main.obj(main.asm)
+00000000       entry
+Module: /home/dhibaid/Documents/Code/C/os/build/stage2/c/main.obj(main)
+00000013+      _cstart
+
+
+                        +---------------------+
+                        |   Module Segments   |
+                        +---------------------+
+
+! = 32-bit segment
+c = initialized communal data
+
+Module          Segment               Class           Address         Size
+======          =======               =====           =======         ====
+
+main.asm        _ENTRY                CODE           00000000         00000013
+main            _TEXT                 CODE           00000013         0000000f
+                CONST                 DATA           00000022         00000000
+                CONST2                DATA           00000022         00000000
+                _DATA                 DATA           00000022         00000000
+Warning! W1014: stack segment not found
+
+
+                        +---------------------------+
+                        |   Unresolved References   |
+                        +---------------------------+
+
+Undefined Symbol                Referenced by
+================                =============
+
+_cstart_                        /home/dhibaid/Documents/Code/C/os/build/stage2/asm/main.obj(main.asm)
+
+
+
+                        +-----------------------+
+                        |   Linker Statistics   |
+                        +-----------------------+
+
+Stack size:  0200 (512.)
+Memory size:  0022 (34.)
+Entry point address: 00000000
+Link time: 00:00.01
