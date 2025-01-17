@@ -14,5 +14,9 @@ This project is a simple operating system written in C. It aims to provide a bas
 - Mtools
 - Mkfs.fat
 
+## Running or Debugging:
+Running: (Built on debian 12 bookworm) `sudo make -s && ./run.sh`
+Debugging: `sudo make -s && ./debug.sh`
+
 ## Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
