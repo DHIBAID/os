@@ -1,2 +1,0 @@
-stdio.h(5): Warning! W138: No newline at end of file
-main.c(4): Warning! W303: Parameter 'bootDrive' has been defined, but not referenced
