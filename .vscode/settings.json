@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.ejs": "html",
+        "printf.h": "c",
+        "stdint.h": "c",
+        "scanf.h": "c",
+        "display.h": "c"
+    },
+    "makefile.configureOnOpen": true
+}
