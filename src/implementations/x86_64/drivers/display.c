@@ -49,12 +49,11 @@ void put_char_at(char c, size_t x, size_t y, uint8_t color)
 {
     if (x >= VGA_WIDTH || y >= VGA_HEIGHT)
     {
-        return; // Out of bounds
+        return;
     }
 
     VGA_BUFFER[y * VGA_WIDTH + x] = (uint16_t)(c | (color << 8));
 
-    // Update cursor position
     size_t cursor_position = y * VGA_WIDTH + x + 1;
     outb(0x3D4, 0x0F);
     outb(0x3D5, (uint8_t)(cursor_position & 0xFF));
@@ -64,30 +63,24 @@ void put_char_at(char c, size_t x, size_t y, uint8_t color)
 
 void remove_char_at_cursor()
 {
-    // Get the current cursor position
     outb(0x3D4, 0x0F);
     size_t cursor_position_low = inb(0x3D5);
     outb(0x3D4, 0x0E);
     size_t cursor_position_high = inb(0x3D5);
     size_t cursor_position = (cursor_position_high << 8) | cursor_position_low;
 
-    // Ensure the cursor does not go out of bounds
     if (cursor_position == 0)
     {
-        return; // Cursor is at the start, nothing to remove
+        return;
     }
 
-    // Move the cursor back one position
     cursor_position--;
 
-    // Calculate x and y from the updated cursor position
     size_t x = cursor_position % VGA_WIDTH;
     size_t y = cursor_position / VGA_WIDTH;
 
-    // Clear the character at the new cursor position
-    VGA_BUFFER[y * VGA_WIDTH + x] = (uint16_t)(' ' | (0x07 << 8)); // Space with default color
+    VGA_BUFFER[y * VGA_WIDTH + x] = (uint16_t)(' ' | (0x07 << 8));
 
-    // Update the cursor position
     outb(0x3D4, 0x0F);
     outb(0x3D5, (uint8_t)(cursor_position & 0xFF));
     outb(0x3D4, 0x0E);
