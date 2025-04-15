@@ -76,13 +76,17 @@ void remove_char_at_cursor()
 
     cursor_position--;
 
-    size_t x = cursor_position % VGA_WIDTH;
-    size_t y = cursor_position / VGA_WIDTH;
+    size_t x1 = cursor_position % VGA_WIDTH;
+    size_t y1 = cursor_position / VGA_WIDTH;
 
-    VGA_BUFFER[y * VGA_WIDTH + x] = (uint16_t)(' ' | (0x07 << 8));
+    VGA_BUFFER[y1 * VGA_WIDTH + x1] = 0;
 
     outb(0x3D4, 0x0F);
     outb(0x3D5, (uint8_t)(cursor_position & 0xFF));
     outb(0x3D4, 0x0E);
     outb(0x3D5, (uint8_t)((cursor_position >> 8) & 0xFF));
+
+    // update the cursor position in printf.c
+    col = x1;
+    row = y1;
 }

@@ -1,8 +1,9 @@
 #include "../../interface/printf.h"
 #include "./drivers/display.h"
 
-static size_t col = 0;
-static size_t row = 0;
+size_t col = 0;
+size_t row = 0;
+
 static uint8_t color = PRINT_COLOR_WHITE | (PRINT_COLOR_BLACK << 4);
 
 void clear_row(size_t row)
@@ -58,5 +59,5 @@ void print_str(char *str)
 
 void print_set_color(uint8_t foreground, uint8_t background)
 {
-    color = foreground | (background << 4);
+    color = foreground |  (background << 4);
 }

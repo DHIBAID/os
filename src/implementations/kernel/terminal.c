@@ -16,12 +16,22 @@ void update_input(char c)
         print_str("/>: ");
         return;
     }
+    else if (c == '\b')
+    {
+        if (len > 0)
+        {
+            len--;
+            inp[len] = '\0';
+        }
+        return;
+    }
+
     if (len < 255)
     {
         inp[len] = c;
         len++;
         inp[len] = '\0';
-    }
+    } // solf lock to prevent buffer overflow
 }
 
 void parse_command(char *command)
@@ -47,15 +57,19 @@ void parse_command(char *command)
     else if (strcmp(command, "shutdown") == 0)
     {
         print_str("Shutting down...\n");
-        sleep(1000);
-        asm volatile(
-            "mov $0x5307, %%ax\n\t"
-            "mov $0x0001, %%bx\n\t"
-            "mov $0x0003, %%cx\n\t"
-            "int $0x15"
-            :
-            :
-            : "ax", "bx", "cx");
+        sleep(2000);
+
+        outw(0x2000, 0x604);
+
+        // fallback
+        print_str("System halted, safe to hard reset.\n");
+        asm volatile("hlt");
+    }
+    else if (strncmp(command, "echo", 4) == 0)
+    {
+        char *message = command + 5;
+        print_str(message);
+        print_str("\n");
     }
     else
     {

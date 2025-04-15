@@ -7,3 +7,8 @@ void sleep(int ms)
         asm volatile("pause");
     }
 }
+
+inline void outw(uint16_t value, uint16_t port)
+{
+    asm volatile("outw %0, %1" : : "a"(value), "Nd"(port));
+}

@@ -1,5 +1,6 @@
 #include "keyboard.h"
 #include "display.h"
+#include "../../kernel/terminal.h"
 
 #define BACKSPACE_SCANCODE 0x0E
 
@@ -34,6 +35,7 @@ char read_from_usb_keyboard()
                 {
                     remove_char_at_cursor();
                     key_char = 0;
+                    update_input('\b');
                 }
                 else
                 {
