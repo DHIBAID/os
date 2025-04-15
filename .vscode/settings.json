@@ -1,7 +1,0 @@
-{
-    "files.associations": {
-        "*.ejs": "html",
-        "printf.h": "c",
-        "string.h": "c"
-    }
-}

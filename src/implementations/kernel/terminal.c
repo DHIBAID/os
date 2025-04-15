@@ -49,7 +49,7 @@ void parse_command(char *command)
         print_str("Shutting down...\n");
         sleep(1000);
         asm volatile(
-            "mov $0x5307, %%ax \n\t"
+            "mov $0x5307, %%ax\n\t"
             "mov $0x0001, %%bx\n\t"
             "mov $0x0003, %%cx\n\t"
             "int $0x15"
