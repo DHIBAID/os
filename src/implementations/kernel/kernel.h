@@ -3,3 +3,4 @@
 #include "../x86_64/drivers/display.h"
 #include "../../interface/util.h"
 #include "terminal.h"
+#include "memory.h"

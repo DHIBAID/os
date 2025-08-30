@@ -47,6 +47,8 @@ void parse_command(char *command)
         print_str("help - Show this help message\n");
         print_str("reboot - Reboot the system\n");
         print_str("shutdown - Shutdown the system\n");
+        print_str("echo <message> - Print a message\n");
+        print_str("meminfo - Show memory information\n");
     }
     else if (strcmp(command, "reboot") == 0)
     {
@@ -70,6 +72,10 @@ void parse_command(char *command)
         char *message = command + 5;
         print_str(message);
         print_str("\n");
+    }
+    else if (strcmp(command, "meminfo") == 0)
+    {
+        meminfo();
     }
     else
     {
