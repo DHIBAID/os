@@ -1,7 +1,13 @@
 #include "disk.h"
 
 #include "../../../interface/printf.h"
+#include "../../../interface/string.h"
 #include "../../kernel/memory.h"
+
+// Global filesystem info and current directory cluster (definitions)
+FAT32_Info global_fat32;
+uint32_t current_dir_cluster = 0;
+int fat32_initialized = 0;
 
 int disk_read(uint32_t lba, uint32_t sectors, void* buffer) {
     if (sectors == 0) return -1;
@@ -417,21 +423,208 @@ void fat32_print_directory_entry(FAT32_DirectoryEntry* entry) {
     print_str("\n");
 }
 
-void ls() {
-    FAT32_Info fat32;
-    if (fat32_init(&fat32) != 0) {
-        print_str("FAT32 initialization failed.\n");
-        return;
+// Helper function to find a file/directory in a specific cluster
+int fat32_find_file_in_cluster(FAT32_Info* info, uint32_t cluster, const char* filename, FAT32_DirectoryEntry* entry) {
+    if (!info || !filename || !entry) return -1;
+
+    // Parse filename to FAT32 8.3 format
+    char fat_name[12];
+    fat32_parse_filename(filename, fat_name);
+
+    // Read directory
+    FAT32_DirectoryEntry entries[128];
+    int count = fat32_read_directory(info, cluster, entries, 128);
+
+    if (count < 0) return -1;
+
+    // Search for file
+    for (int i = 0; i < count; i++) {
+        if (memcmp(entries[i].name, fat_name, 11) == 0) {
+            memcpy(entry, &entries[i], sizeof(FAT32_DirectoryEntry));
+            return 0;
+        }
     }
+
+    return -1;  // File not found
+}
+
+void list_dir(FAT32_Info* info, uint32_t cluster) {
+    if (!info) return;
 
     FAT32_DirectoryEntry entries[128];
-    int count = fat32_read_directory(&fat32, fat32.root_cluster, entries, 128);
+    int count = fat32_read_directory(info, cluster, entries, 128);
     if (count < 0) {
-        print_str("Failed to read root directory.\n");
+        print_str("Failed to read directory.\n");
         return;
     }
 
-    print_str("Root Directory:\n");
+    if (count == 0) {
+        print_str("Empty directory\n");
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        fat32_print_directory_entry(&entries[i]);
+    }
+}
+
+void change_directory(char* path) {
+    // Initialize FAT32 if not already done
+    if (!fat32_initialized) {
+        if (fat32_init(&global_fat32) != 0) {
+            print_str("FAT32 initialization failed.\n");
+            return;
+        }
+        current_dir_cluster = global_fat32.root_cluster;
+        fat32_initialized = 1;
+    }
+
+    // Handle empty path or "." (stay in current directory)
+    if (!path || strcmp(path, "") == 0 || strcmp(path, ".") == 0 || strcmp(path, "./") == 0) {
+        return;
+    }
+
+    // Handle "/" (root directory)
+    if (strcmp(path, "/") == 0) {
+        current_dir_cluster = global_fat32.root_cluster;
+        strcpy(currentDirectory, "/");
+        return;
+    }
+
+    // Handle ".." or "../" (parent directory)
+    if (strcmp(path, "..") == 0 || strcmp(path, "../") == 0) {
+        // If already at root, stay there
+        if (strcmp(currentDirectory, "/") == 0) {
+            return;
+        }
+
+        // Update path string - remove last directory component
+        int last_slash = -1;
+        for (int i = 0; currentDirectory[i] != '\0'; i++) {
+            if (currentDirectory[i] == '/') {
+                last_slash = i;
+            }
+        }
+
+        // Build parent path
+        char parent_path[256];
+        if (last_slash > 0) {
+            // Copy everything up to the last slash
+            for (int i = 0; i < last_slash; i++) {
+                parent_path[i] = currentDirectory[i];
+            }
+            parent_path[last_slash] = '\0';
+        } else {
+            // Parent is root
+            strcpy(parent_path, "/");
+        }
+
+        // Navigate from root to find the parent directory
+        if (strcmp(parent_path, "/") == 0) {
+            current_dir_cluster = global_fat32.root_cluster;
+            strcpy(currentDirectory, "/");
+        } else {
+            // Parse the parent path and navigate step by step
+            uint32_t search_cluster = global_fat32.root_cluster;
+            char temp_path[256] = "/";
+
+            // Skip the leading '/'
+            int path_idx = 1;
+            while (parent_path[path_idx] != '\0') {
+                // Extract next directory component
+                char component[12];
+                int comp_idx = 0;
+                while (parent_path[path_idx] != '/' && parent_path[path_idx] != '\0' && comp_idx < 11) {
+                    component[comp_idx++] = parent_path[path_idx++];
+                }
+                component[comp_idx] = '\0';
+
+                if (comp_idx > 0) {
+                    // Find this component in current search cluster
+                    FAT32_DirectoryEntry found_entry;
+                    if (fat32_find_file_in_cluster(&global_fat32, search_cluster, component, &found_entry) != 0) {
+                        print_str("cd: invalid parent path\n");
+                        return;
+                    }
+
+                    search_cluster = ((uint32_t)found_entry.first_cluster_high << 16) | found_entry.first_cluster_low;
+                }
+
+                // Skip the '/' if present
+                if (parent_path[path_idx] == '/') {
+                    path_idx++;
+                }
+            }
+
+            current_dir_cluster = search_cluster;
+            strcpy(currentDirectory, parent_path);
+        }
+        return;
+    }
+
+    // Handle subdirectory navigation
+    FAT32_DirectoryEntry dir_entry;
+    if (fat32_find_file_in_cluster(&global_fat32, current_dir_cluster, path, &dir_entry) != 0) {
+        print_str("cd: ");
+        print_str(path);
+        print_str(": No such directory\n");
+        return;
+    }
+
+    // Check if it's a directory
+    if (!(dir_entry.attributes & FAT32_ATTR_DIRECTORY)) {
+        print_str("cd: ");
+        print_str(path);
+        print_str(": Not a directory\n");
+        return;
+    }
+
+    // Get directory cluster
+    uint32_t dir_cluster = ((uint32_t)dir_entry.first_cluster_high << 16) | dir_entry.first_cluster_low;
+    current_dir_cluster = dir_cluster;
+
+    // Update currentDirectory path
+    if (strcmp(currentDirectory, "/") != 0) {
+        strcat(currentDirectory, "/");
+    }
+
+    // Add directory name (convert from FAT32 format)
+    int path_len = strlen(currentDirectory);
+    int j = 0;
+    for (int i = 0; i < 8 && dir_entry.name[i] != ' '; i++) {
+        currentDirectory[path_len + j] = dir_entry.name[i];
+        j++;
+    }
+    currentDirectory[path_len + j] = '\0';
+}
+
+void list_subdirectory(FAT32_Info* info, const char* dirname) {
+    FAT32_DirectoryEntry entry;
+
+    // Find the directory
+    if (fat32_find_file(info, dirname, &entry) != 0) {
+        print_str("Directory not found\n");
+        return;
+    }
+
+    // Check if it's actually a directory
+    if (!(entry.attributes & FAT32_ATTR_DIRECTORY)) {
+        print_str("Not a directory\n");
+        return;
+    }
+
+    // Get directory's cluster
+    uint32_t dir_cluster = ((uint32_t)entry.first_cluster_high << 16) | entry.first_cluster_low;
+
+    // Read and display entries
+    FAT32_DirectoryEntry entries[128];
+    int count = fat32_read_directory(info, dir_cluster, entries, 128);
+
+    if (count < 0) {
+        print_str("Failed to read directory\n");
+        return;
+    }
+
     for (int i = 0; i < count; i++) {
         fat32_print_directory_entry(&entries[i]);
     }

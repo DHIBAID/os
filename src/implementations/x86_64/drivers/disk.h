@@ -1,3 +1,6 @@
+#ifndef DISK_H
+#define DISK_H
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -176,7 +179,15 @@ void fat32_print_boot_sector(FAT32_BootSector* boot_sector);
 void fat32_print_directory_entry(FAT32_DirectoryEntry* entry);
 
 // 8. Terminal Functions
-void ls();
+void list_dir(FAT32_Info* info, uint32_t cluster);
+void change_directory(char* path);
+int fat32_find_file_in_cluster(FAT32_Info* info, uint32_t cluster, const char* filename, FAT32_DirectoryEntry* entry);
+
+// 9. Global Variables
+extern FAT32_Info global_fat32;
+extern uint32_t current_dir_cluster;
+extern int fat32_initialized;
+extern char* currentDirectory;
 
 // Helper functions for port I/O
 static inline void outb(uint16_t port, uint8_t val) {
@@ -216,3 +227,5 @@ static int ata_wait_drq() {
     }
     return -1;  // Timeout
 }
+
+#endif  // DISK_H

@@ -1,6 +1,4 @@
 #include "terminal.h"
-#include "../../interface/printf.h"
-#include "../../interface/string.h"
 
 char* inp;
 int len = 0;
@@ -9,22 +7,23 @@ void update_input(char c) {
     if (c == '\n') {
         print_newline();
         parse_command(inp);
-        inp[len] = '\0';
+        // Reset input buffer after processing command
         len = 0;
-        print_str("/>: ");
+        *(inp + len) = '\0';
+        print_str(strconcat(currentDirectory, ">: "));
         return;
     } else if (c == '\b') {
         if (len > 0) {
             len--;
-            inp[len] = '\0';
+            *(inp + len) = '\0';
         }
         return;
     }
 
     if (len < 255) {
-        inp[len] = c;
+        *(inp + len) = c;
         len++;
-        inp[len] = '\0';
+        *(inp + len) = '\0';
     }  // solf lock to prevent buffer overflow
 }
 
@@ -39,6 +38,8 @@ void parse_command(char* command) {
         print_str("shutdown - Shutdown the system\n");
         print_str("echo <message> - Print a message\n");
         print_str("meminfo - Show memory information\n");
+        print_str("ls - List files in the current directory\n");
+        print_str("cd <directory> - Change the current directory\n");
     } else if (strcmp(command, "reboot") == 0) {
         print_str("Rebooting...\n");
         sleep(1000);
@@ -59,7 +60,22 @@ void parse_command(char* command) {
     } else if (strcmp(command, "meminfo") == 0) {
         meminfo();
     } else if (strcmp(command, "ls") == 0) {
-        ls();
+        if (!fat32_initialized) {
+            if (fat32_init(&global_fat32) != 0) {
+                print_str("FAT32 initialization failed.\n");
+                return;
+            }
+            current_dir_cluster = global_fat32.root_cluster;
+            fat32_initialized = 1;
+        }
+        list_dir(&global_fat32, current_dir_cluster);
+    } else if (strncmp(command, "cd ", 3) == 0) {
+        change_directory(command + 3);
+    } else if (strcmp(command, "cd") == 0) {
+        // cd without arguments - go to root
+        change_directory("/");
+    } else if (strcmp(command, "") == 0) {
+        // Do nothing for empty command
     } else {
         print_str("Unknown command: ");
         print_str(command);

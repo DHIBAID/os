@@ -1,5 +1,8 @@
 #include "kernel.h"
 
+// Global variable definition
+char* currentDirectory = "/";
+
 // Forward declaration
 
 // Example memory initialization function
@@ -16,15 +19,14 @@ void init_memory_management() {
 }
 
 void kernel_main() {
-    init_memory_management();
-
     print_clear();
     print_set_color(PRINT_COLOR_WHITE, PRINT_COLOR_BLACK);
     print_str("Welcome to our 64-bit kernel!\n");
 
     // Setup memory management
+    init_memory_management();
 
-    print_str("/>: ");
+    print_str(strconcat(currentDirectory, ">: "));
 
     while (1) {
         char c = bios_get_char();

@@ -52,7 +52,25 @@ mkdir -p $MOUNT_POINT/boot/grub
 # Copy kernel
 echo "Copying kernel..."
 cp $KERNEL_BIN $MOUNT_POINT/boot/kernel.bin
-echo "Kernel copied to /boot/kernel.bin"
+
+# Sync to ensure data is written to disk
+sync
+
+# Verify kernel was copied correctly
+if [ ! -f "$MOUNT_POINT/boot/kernel.bin" ]; then
+    echo "Error: Kernel file not found after copy!"
+    exit 1
+fi
+
+ORIG_SIZE=$(stat -c%s "$KERNEL_BIN")
+COPY_SIZE=$(stat -c%s "$MOUNT_POINT/boot/kernel.bin")
+
+if [ "$ORIG_SIZE" -ne "$COPY_SIZE" ]; then
+    echo "Error: Kernel size mismatch! Original: $ORIG_SIZE, Copied: $COPY_SIZE"
+    exit 1
+fi
+
+echo "Kernel copied to /boot/kernel.bin (${COPY_SIZE} bytes)"
 
 if [ "$INSTALL_GRUB" = true ]; then
     # Create GRUB configuration
@@ -69,6 +87,11 @@ EOF
 
     echo "GRUB configuration created"
 fi
+
+# Ensure all data is written before unmount
+echo "Flushing data to disk..."
+sync
+sleep 0.5  # Give filesystem a moment to complete any pending operations
 
 # Unmount
 echo "Unmounting disk..."
@@ -96,6 +119,11 @@ if [ "$INSTALL_GRUB" = true ]; then
     else
         echo "✗ Warning: GRUB installation may have failed"
     fi
+
+    # Ensure all GRUB data is written
+    echo "Flushing GRUB data..."
+    sync
+    sleep 0.5
 
     # Cleanup
     sudo umount $GRUB_MOUNT
