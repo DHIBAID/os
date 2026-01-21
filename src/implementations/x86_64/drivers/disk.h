@@ -228,4 +228,21 @@ static int ata_wait_drq() {
     return -1;  // Timeout
 }
 
+// Disk write (PIO)
+int disk_write(uint32_t lba, uint32_t sectors, const void* buffer);
+
+// FAT/FS write helpers
+int fat32_write_cluster(FAT32_Info* info, uint32_t cluster, const void* buffer);
+uint32_t fat32_allocate_cluster(FAT32_Info* info);
+int fat32_write_fat_entry(FAT32_Info* info, uint32_t cluster, uint32_t value);
+int fat32_write_directory_entry(FAT32_Info* info, uint32_t dir_cluster, size_t entry_index, FAT32_DirectoryEntry* entry);
+int fat32_find_free_directory_entry(FAT32_Info* info, uint32_t dir_cluster, uint32_t* out_cluster, size_t* out_index);
+
+// High-level operations
+int fat32_create_file(FAT32_Info* info, uint32_t dir_cluster, const char* name);
+int fat32_delete_file(FAT32_Info* info, uint32_t dir_cluster, const char* name);
+int fat32_create_directory(FAT32_Info* info, uint32_t dir_cluster, const char* name);
+int fat32_remove_directory(FAT32_Info* info, uint32_t dir_cluster, const char* name);
+int fat32_cat(FAT32_Info* info, const char* filename);
+
 #endif  // DISK_H

@@ -74,6 +74,77 @@ void parse_command(char* command) {
     } else if (strcmp(command, "cd") == 0) {
         // cd without arguments - go to root
         change_directory("/");
+    } else if (strncmp(command, "cat ", 4) == 0) {
+        char* arg = command + 4;
+        if (!fat32_initialized) {
+            if (fat32_init(&global_fat32) != 0) {
+                print_str("FAT32 initialization failed.\n");
+                return;
+            }
+            current_dir_cluster = global_fat32.root_cluster;
+            fat32_initialized = 1;
+        }
+        fat32_cat(&global_fat32, arg);
+    } else if (strncmp(command, "touch ", 6) == 0) {
+        char* arg = command + 6;
+        if (!fat32_initialized) {
+            if (fat32_init(&global_fat32) != 0) {
+                print_str("FAT32 initialization failed.\n");
+                return;
+            }
+            current_dir_cluster = global_fat32.root_cluster;
+            fat32_initialized = 1;
+        }
+        if (fat32_create_file(&global_fat32, current_dir_cluster, arg) == 0) {
+            print_str("File created\n");
+        } else {
+            print_str("Failed to create file\n");
+        }
+    } else if (strncmp(command, "mkdir ", 6) == 0) {
+        char* arg = command + 6;
+        if (!fat32_initialized) {
+            if (fat32_init(&global_fat32) != 0) {
+                print_str("FAT32 initialization failed.\n");
+                return;
+            }
+            current_dir_cluster = global_fat32.root_cluster;
+            fat32_initialized = 1;
+        }
+        if (fat32_create_directory(&global_fat32, current_dir_cluster, arg) == 0) {
+            print_str("Directory created\n");
+        } else {
+            print_str("Failed to create directory\n");
+        }
+    } else if (strncmp(command, "rmdir ", 6) == 0) {
+        char* arg = command + 6;
+        if (!fat32_initialized) {
+            if (fat32_init(&global_fat32) != 0) {
+                print_str("FAT32 initialization failed.\n");
+                return;
+            }
+            current_dir_cluster = global_fat32.root_cluster;
+            fat32_initialized = 1;
+        }
+        if (fat32_remove_directory(&global_fat32, current_dir_cluster, arg) == 0) {
+            print_str("Directory removed\n");
+        } else {
+            print_str("Failed to remove directory\n");
+        }
+    } else if (strncmp(command, "rm ", 3) == 0) {
+        char* arg = command + 3;
+        if (!fat32_initialized) {
+            if (fat32_init(&global_fat32) != 0) {
+                print_str("FAT32 initialization failed.\n");
+                return;
+            }
+            current_dir_cluster = global_fat32.root_cluster;
+            fat32_initialized = 1;
+        }
+        if (fat32_delete_file(&global_fat32, current_dir_cluster, arg) == 0) {
+            print_str("Deleted\n");
+        } else {
+            print_str("Failed to delete\n");
+        }
     } else if (strcmp(command, "") == 0) {
         // Do nothing for empty command
     } else {
