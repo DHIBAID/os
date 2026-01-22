@@ -1,7 +1,8 @@
-#include <stdint.h>
-#include <stddef.h>
 #include <stdarg.h>
-#include "./display.h"
+#include <stddef.h>
+#include <stdint.h>
+
+#include "drivers/display.h"
 
 #define USB_KEYBOARD_BUFFER_SIZE 16
 

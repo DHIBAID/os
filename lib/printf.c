@@ -1,6 +1,6 @@
-#include "../../interface/printf.h"
+#include "lib/printf.h"
 
-#include "./drivers/display.h"
+#include "drivers/display.h"
 
 size_t col = 0;
 size_t row = 0;

@@ -1,6 +1,6 @@
-#include "memory.h"
+#include "drivers/memory.h"
 
-#include "../../interface/printf.h"
+#include "lib/printf.h"
 
 // Kernel Heap globals
 static void* heap_current = 0;           // Current position in heap

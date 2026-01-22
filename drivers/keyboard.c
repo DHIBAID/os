@@ -1,7 +1,7 @@
-#include "keyboard.h"
+#include "drivers/keyboard.h"
 
-#include "../../kernel/terminal.h"
-#include "display.h"
+#include "drivers/display.h"
+#include "kernel/terminal.h"
 
 #define BACKSPACE_SCANCODE 0x0E
 

@@ -1,3 +1,0 @@
-#! /bin/bash
-
-clear && make build-x86_64

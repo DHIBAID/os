@@ -3,12 +3,12 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "../../interface/printf.h"
-#include "../../interface/string.h"
-#include "../../interface/util.h"
-#include "../x86_64/drivers/disk.h"
-#include "kernel.h"
-#include "memory.h"
+#include "drivers/disk.h"
+#include "drivers/memory.h"
+#include "kernel/kernel.h"
+#include "lib/printf.h"
+#include "lib/string.h"
+#include "lib/util.h"
 
 void update_input(char c);
 void parse_command(char* command);

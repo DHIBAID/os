@@ -1,8 +1,8 @@
-#include "disk.h"
+#include "drivers/disk.h"
 
-#include "../../../interface/printf.h"
-#include "../../../interface/string.h"
-#include "../../kernel/memory.h"
+#include "drivers/memory.h"
+#include "lib/printf.h"
+#include "lib/string.h"
 
 // Global filesystem info and current directory cluster (definitions)
 FAT32_Info global_fat32;
@@ -815,15 +815,7 @@ void list_dir(FAT32_Info* info, uint32_t cluster) {
 }
 
 void change_directory(char* path) {
-    // Initialize FAT32 if not already done
-    if (!fat32_initialized) {
-        if (fat32_init(&global_fat32) != 0) {
-            print_str("FAT32 initialization failed.\n");
-            return;
-        }
-        current_dir_cluster = global_fat32.root_cluster;
-        fat32_initialized = 1;
-    }
+    current_dir_cluster = global_fat32.root_cluster;
 
     // Handle empty path or "." (stay in current directory)
     if (!path || strcmp(path, "") == 0 || strcmp(path, ".") == 0 || strcmp(path, "./") == 0) {

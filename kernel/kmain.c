@@ -1,9 +1,7 @@
-#include "kernel.h"
+#include "kernel/kernel.h"
 
 // Global variable definition
 char* currentDirectory = "/";
-
-// Forward declaration
 
 // Example memory initialization function
 void init_memory_management() {
@@ -18,6 +16,16 @@ void init_memory_management() {
     kheap_init(heap_start);
 }
 
+int init_fat32() {
+    if (!fat32_initialized) {
+        if (fat32_init(&global_fat32) != 0) {
+            print_str("FAT32 initialization failed.\n");
+            return -1;
+        }
+    }
+    return 0;
+}
+
 void kernel_main() {
     print_clear();
     print_set_color(PRINT_COLOR_WHITE, PRINT_COLOR_BLACK);
@@ -25,6 +33,12 @@ void kernel_main() {
 
     // Setup memory management
     init_memory_management();
+
+    // Initialize FAT32 filesystem
+    int fat32_status = init_fat32();
+    if (fat32_status != 0) {
+        __asm__ volatile("hlt");
+    }
 
     print_str(strconcat(currentDirectory, ">: "));
 

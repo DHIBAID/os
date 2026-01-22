@@ -1,4 +1,4 @@
-#include "terminal.h"
+#include "kernel/terminal.h"
 
 char* inp;
 int len = 0;
@@ -40,6 +40,11 @@ void parse_command(char* command) {
         print_str("meminfo - Show memory information\n");
         print_str("ls - List files in the current directory\n");
         print_str("cd <directory> - Change the current directory\n");
+        print_str("cat <file> - Display file contents\n");
+        print_str("touch <file> - Create a new file\n");
+        print_str("mkdir <directory> - Create a new directory\n");
+        print_str("rmdir <directory> - Remove a directory\n");
+        print_str("rm <file> - Delete a file\n");
     } else if (strcmp(command, "reboot") == 0) {
         print_str("Rebooting...\n");
         sleep(1000);
@@ -60,14 +65,7 @@ void parse_command(char* command) {
     } else if (strcmp(command, "meminfo") == 0) {
         meminfo();
     } else if (strcmp(command, "ls") == 0) {
-        if (!fat32_initialized) {
-            if (fat32_init(&global_fat32) != 0) {
-                print_str("FAT32 initialization failed.\n");
-                return;
-            }
-            current_dir_cluster = global_fat32.root_cluster;
-            fat32_initialized = 1;
-        }
+        current_dir_cluster = global_fat32.root_cluster;
         list_dir(&global_fat32, current_dir_cluster);
     } else if (strncmp(command, "cd ", 3) == 0) {
         change_directory(command + 3);
@@ -76,25 +74,11 @@ void parse_command(char* command) {
         change_directory("/");
     } else if (strncmp(command, "cat ", 4) == 0) {
         char* arg = command + 4;
-        if (!fat32_initialized) {
-            if (fat32_init(&global_fat32) != 0) {
-                print_str("FAT32 initialization failed.\n");
-                return;
-            }
-            current_dir_cluster = global_fat32.root_cluster;
-            fat32_initialized = 1;
-        }
+
+        current_dir_cluster = global_fat32.root_cluster;
         fat32_cat(&global_fat32, arg);
     } else if (strncmp(command, "touch ", 6) == 0) {
         char* arg = command + 6;
-        if (!fat32_initialized) {
-            if (fat32_init(&global_fat32) != 0) {
-                print_str("FAT32 initialization failed.\n");
-                return;
-            }
-            current_dir_cluster = global_fat32.root_cluster;
-            fat32_initialized = 1;
-        }
         if (fat32_create_file(&global_fat32, current_dir_cluster, arg) == 0) {
             print_str("File created\n");
         } else {
@@ -102,14 +86,6 @@ void parse_command(char* command) {
         }
     } else if (strncmp(command, "mkdir ", 6) == 0) {
         char* arg = command + 6;
-        if (!fat32_initialized) {
-            if (fat32_init(&global_fat32) != 0) {
-                print_str("FAT32 initialization failed.\n");
-                return;
-            }
-            current_dir_cluster = global_fat32.root_cluster;
-            fat32_initialized = 1;
-        }
         if (fat32_create_directory(&global_fat32, current_dir_cluster, arg) == 0) {
             print_str("Directory created\n");
         } else {
@@ -117,14 +93,6 @@ void parse_command(char* command) {
         }
     } else if (strncmp(command, "rmdir ", 6) == 0) {
         char* arg = command + 6;
-        if (!fat32_initialized) {
-            if (fat32_init(&global_fat32) != 0) {
-                print_str("FAT32 initialization failed.\n");
-                return;
-            }
-            current_dir_cluster = global_fat32.root_cluster;
-            fat32_initialized = 1;
-        }
         if (fat32_remove_directory(&global_fat32, current_dir_cluster, arg) == 0) {
             print_str("Directory removed\n");
         } else {
@@ -132,14 +100,6 @@ void parse_command(char* command) {
         }
     } else if (strncmp(command, "rm ", 3) == 0) {
         char* arg = command + 3;
-        if (!fat32_initialized) {
-            if (fat32_init(&global_fat32) != 0) {
-                print_str("FAT32 initialization failed.\n");
-                return;
-            }
-            current_dir_cluster = global_fat32.root_cluster;
-            fat32_initialized = 1;
-        }
         if (fat32_delete_file(&global_fat32, current_dir_cluster, arg) == 0) {
             print_str("Deleted\n");
         } else {
