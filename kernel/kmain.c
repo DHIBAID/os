@@ -48,4 +48,7 @@ void kernel_main() {
         update_input(c);
         c != '\n' ? print_str(buffer) : 0;
     }
+
+    // Main execution loop exited, something went wrong
+    kernel_panic("Kernel main loop exited unexpectedly.");
 }

@@ -65,7 +65,6 @@ void parse_command(char* command) {
     } else if (strcmp(command, "meminfo") == 0) {
         meminfo();
     } else if (strcmp(command, "ls") == 0) {
-        current_dir_cluster = global_fat32.root_cluster;
         list_dir(&global_fat32, current_dir_cluster);
     } else if (strncmp(command, "cd ", 3) == 0) {
         change_directory(command + 3);
@@ -75,7 +74,6 @@ void parse_command(char* command) {
     } else if (strncmp(command, "cat ", 4) == 0) {
         char* arg = command + 4;
 
-        current_dir_cluster = global_fat32.root_cluster;
         fat32_cat(&global_fat32, arg);
     } else if (strncmp(command, "touch ", 6) == 0) {
         char* arg = command + 6;

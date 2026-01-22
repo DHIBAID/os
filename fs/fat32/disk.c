@@ -178,6 +178,10 @@ int fat32_init(FAT32_Info* info) {
     print_dec(info->root_cluster);
     print_str("\n");
 
+    /* Set the current directory cluster to root on successful init */
+    current_dir_cluster = info->root_cluster;
+    fat32_initialized = 1;
+
     return 0;
 }
 
@@ -815,8 +819,6 @@ void list_dir(FAT32_Info* info, uint32_t cluster) {
 }
 
 void change_directory(char* path) {
-    current_dir_cluster = global_fat32.root_cluster;
-
     // Handle empty path or "." (stay in current directory)
     if (!path || strcmp(path, "") == 0 || strcmp(path, ".") == 0 || strcmp(path, "./") == 0) {
         return;
