@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef MEMORY_H
+#define MEMORY_H
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -27,3 +30,5 @@ void meminfo();
 static uint64_t* pmm_bitmap = 0;       // Bitmap to track frame allocation
 static uint64_t pmm_total_frames = 0;  // Total number of frames
 static uint64_t pmm_free_frames = 0;   // Number of free frames
+
+#endif  // MEMORY_H

@@ -1,3 +1,7 @@
+#ifndef KERNEL_H
+#define KERNEL_H
+
+#include "arch/idt.h"
 #include "drivers/display.h"
 #include "drivers/keyboard.h"
 #include "drivers/memory.h"
@@ -7,4 +11,8 @@
 #include "lib/string.h"
 #include "lib/util.h"
 
+#include "tests/test_idt.h"  // Include test headers as needed
+
 extern char* currentDirectory;
+
+#endif  // KERNEL_H

@@ -56,9 +56,21 @@ void kernel_panic(const char* message) {
     print_str("\nRegisters:\n");
     read_registers();
 
-    print_str("Stack trace:\n");
-    // TODO: Implement stack trace by walking the stack frames
+    print_str("\nStack trace:\n");
+    
     // Walk the stack using RBP and print return addresses
+    uint64_t* rbp;
+    __asm__ volatile("mov %%rbp, %0" : "=r"(rbp));
+    for (int i = 0; i < 10; i++) {
+        if (rbp == NULL || *rbp == 0) {
+            break;
+        }
+        uint64_t return_address = *(rbp + 1);
+        print_str(" 0x");
+        print_hex(return_address);
+        print_str("\n");
+        rbp = (uint64_t*)(*rbp);
+    }
 
     print_str("\nSystem halted.\n");
 

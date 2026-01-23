@@ -1,8 +1,8 @@
 all_c_sources := $(shell find . -name '*.c' -not -path './build/*' -not -path './dist/*' -not -path './targets/*' -printf '%P\n')
 all_object_files := $(patsubst %.c, build/%.o, $(all_c_sources))
 
-x86_64_asm_source_files := $(shell find boot -name '*.asm')
-x86_64_asm_object_files := $(patsubst boot/%.asm, build/x86_64/%.o, $(x86_64_asm_source_files))
+x86_64_asm_source_files := $(shell find . -name '*.asm' -not -path './build/*' -not -path './dist/*' -not -path './targets/*' -printf '%P\n')
+x86_64_asm_object_files := $(patsubst %.asm, build/x86_64/%.o, $(x86_64_asm_source_files))
 
 x86_64_object_files := $(x86_64_c_object_files) $(x86_64_asm_object_files)
 
@@ -10,22 +10,22 @@ build/%.o: %.c
 	mkdir -p $(dir $@) && \
 	x86_64-elf-gcc -c -I includes -ffreestanding $< -o $@
 
-$(x86_64_asm_object_files): build/x86_64/%.o : boot/%.asm
+$(x86_64_asm_object_files): build/x86_64/%.o : %.asm
 	mkdir -p $(dir $@) && \
-	nasm -f elf64 $(patsubst build/x86_64/%.o, boot/%.asm, $@) -o $@
+	nasm -f elf64 $< -o $@
 
 .PHONY: build-x86_64
-build-x86_64: $(all_object_files) $(x86_64_asm_object_files)
+build-x86_64: clean-x86_64 \
+	$(all_object_files) $(x86_64_asm_object_files)
 	mkdir -p dist/x86_64 && \
 	x86_64-elf-ld -n -o dist/x86_64/kernel.bin -T targets/x86_64/linker.ld $(all_object_files) $(x86_64_asm_object_files) && \
 	cp dist/x86_64/kernel.bin targets/x86_64/iso/boot/kernel.bin && \
 	grub-mkrescue -o dist/x86_64/kernel.iso targets/x86_64/iso
 
 clean-x86_64:
-	sudo rm -rf build/x86_64
-	sudo rm -rf build/kernel
-	sudo rm -rf dist/x86_64
-	sudo rm -rf targets/x86_64/iso/boot/kernel.bin
+	$(SUDO) rm -rf build/*
+	$(SUDO) rm -rf dist/x86_64
+	$(SUDO) rm -rf targets/x86_64/iso/boot/kernel.bin
 
 DISK_IMAGE := disk.img
 MOUNT_POINT := mnt

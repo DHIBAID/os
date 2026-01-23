@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef KEYBOARD_H
+#define KEYBOARD_H
+
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -9,3 +14,5 @@
 char bios_get_char();
 char read_from_usb_keyboard();
 int is_backspace(char c);
+
+#endif  // KEYBOARD_H

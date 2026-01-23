@@ -10,7 +10,7 @@ static int usb_read(uint8_t* buffer, size_t size);
 char bios_get_char() {
     char c = 0;
     while ((c = read_from_usb_keyboard()) == 0) {
-        asm volatile("pause");
+        __asm__ volatile("pause");
     }
     return c;
 }
@@ -55,7 +55,7 @@ static int usb_read(uint8_t* buffer, size_t size) {
     }
 
     uint8_t scancode;
-    asm volatile(
+    __asm__ volatile(
         "inb $0x60, %%al\n"
         : "=a"(scancode)
         :

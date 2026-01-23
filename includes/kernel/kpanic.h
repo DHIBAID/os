@@ -1,7 +1,7 @@
 #ifndef KPANIC_H
 #define KPANIC_H
 
-#include <stddef.h>
+#include <stdint.h>
 
 #include "drivers/disk.h"
 #include "lib/printf.h"

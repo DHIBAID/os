@@ -30,7 +30,7 @@ char* strconcat(const char* str1, const char* str2) {
     while (str1[len1] != '\0') len1++;
     while (str2[len2] != '\0') len2++;
 
-    char* result = (char*)kmalloc(len1 + len2 + 1);
+    char* result = (char*) kmalloc(len1 + len2 + 1);
     for (size_t i = 0; i < len1; i++) {
         result[i] = str1[i];
     }

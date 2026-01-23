@@ -48,7 +48,7 @@ void parse_command(char* command) {
     } else if (strcmp(command, "reboot") == 0) {
         print_str("Rebooting...\n");
         sleep(1000);
-        asm volatile("int $0x19");  // BIOS interrupt for reboot
+        __asm__ volatile("int $0x19");  // BIOS interrupt for reboot
     } else if (strcmp(command, "shutdown") == 0) {
         print_str("Shutting down...\n");
         sleep(2000);
@@ -57,7 +57,7 @@ void parse_command(char* command) {
 
         // fallback
         print_str("System halted, safe to hard reset.\n");
-        asm volatile("hlt");
+        __asm__ volatile("hlt");
     } else if (strncmp(command, "echo", 4) == 0) {
         char* message = command + 5;
         print_str(message);

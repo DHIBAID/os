@@ -27,9 +27,9 @@ int init_fat32() {
 }
 
 void kernel_main() {
-    print_clear();
-    print_set_color(PRINT_COLOR_WHITE, PRINT_COLOR_BLACK);
-    print_str("Welcome to our 64-bit kernel!\n");
+    // Setup IDTR and IDT
+    idt_init();
+    idt_load();
 
     // Setup memory management
     init_memory_management();
@@ -39,6 +39,12 @@ void kernel_main() {
     if (fat32_status != 0) {
         __asm__ volatile("hlt");
     }
+    print_clear();
+    print_set_color(PRINT_COLOR_WHITE, PRINT_COLOR_BLACK);
+    print_str("Welcome to our 64-bit kernel!\n");
+
+    // Call test functions below this line (if any) ------------------------
+    test_divide_by_zero();
 
     print_str(strconcat(currentDirectory, ">: "));
 
