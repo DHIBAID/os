@@ -35,7 +35,8 @@ void idt_load();
 // Initialize the IDT with default handlers
 void idt_init();
 
-// Handler definitions
+// Handler definitions from isrs.asm
 void isr_divide_by_zero();
+void isr_debug_exception();
 
 #endif  // IDT_H

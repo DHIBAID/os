@@ -16,6 +16,9 @@ typedef struct {
     // Instruction pointer and flags
     int64_t RIP, RFLAGS;
 
+    // Debug registers
+    int64_t DR0, DR1, DR2, DR3, DR6, DR7;
+
 } registers_t;
 
 void kernel_panic(const char* message);

@@ -71,9 +71,4 @@ void kernel_panic(const char* message) {
         print_str("\n");
         rbp = (uint64_t*)(*rbp);
     }
-
-    print_str("\nSystem halted.\n");
-
-    // Halt the CPU
-    for (;;) __asm__ volatile("hlt");
 }

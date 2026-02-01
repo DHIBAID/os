@@ -37,6 +37,7 @@ void kernel_main() {
     // Initialize FAT32 filesystem
     int fat32_status = init_fat32();
     if (fat32_status != 0) {
+        // TODO: Gracefully handle fat32 init failure.
         __asm__ volatile("hlt");
     }
     print_clear();
@@ -44,7 +45,7 @@ void kernel_main() {
     print_str("Welcome to our 64-bit kernel!\n");
 
     // Call test functions below this line (if any) ------------------------
-    test_divide_by_zero();
+    test_debug_exception();
 
     print_str(strconcat(currentDirectory, ">: "));
 
@@ -57,4 +58,5 @@ void kernel_main() {
 
     // Main execution loop exited, something went wrong
     kernel_panic("Kernel main loop exited unexpectedly.");
+    for (;;) __asm__ volatile("hlt");
 }
