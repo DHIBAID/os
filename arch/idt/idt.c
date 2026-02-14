@@ -18,7 +18,7 @@ void divide_by_zero_handler() {
 // IDT[1]
 void debug_exception_handler(interrupt_frame_t* frame, debug_state_t* state) {
     uint64_t cause = state->dr6;
-    uint64_t saved_dr7 = 0;
+    static uint64_t saved_dr7 = 0;
 
     // Hardware breakpoint?
     if (cause & 0xF) {
