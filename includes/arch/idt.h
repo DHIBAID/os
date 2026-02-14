@@ -6,6 +6,22 @@
 #include <stdint.h>
 
 #include "kernel/kpanic.h"
+#include "lib/printf.h"
+
+typedef struct debug_state {
+    uint64_t dr0;
+    uint64_t dr1;
+    uint64_t dr2;
+    uint64_t dr3;
+    uint64_t dr6;
+    uint64_t dr7;
+} debug_state_t;
+
+typedef struct interrupt_frame {
+    uint64_t rip;
+    uint64_t cs;
+    uint64_t rflags;
+} interrupt_frame_t;
 
 struct idt_entry {
     uint16_t off_low;

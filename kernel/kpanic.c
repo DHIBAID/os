@@ -19,25 +19,25 @@ void read_registers() {
           "=m"(regs.RSI), "=m"(regs.RDI), "=m"(regs.RBP), "=m"(regs.RSP),
           "=m"(regs.RIP), "=m"(regs.RFLAGS));
 
-    print_str("RAX: 0x");
+    print_str("RAX: ");
     print_hex(regs.RAX);
-    print_str(" RBX: 0x");
+    print_str(" RBX: ");
     print_hex(regs.RBX);
-    print_str(" RCX: 0x");
+    print_str(" RCX: ");
     print_hex(regs.RCX);
-    print_str(" RDX: 0x");
+    print_str(" RDX: ");
     print_hex(regs.RDX);
-    print_str("\nRSI: 0x");
+    print_str("\nRSI: ");
     print_hex(regs.RSI);
-    print_str(" RDI: 0x");
+    print_str(" RDI: ");
     print_hex(regs.RDI);
-    print_str(" RBP: 0x");
+    print_str(" RBP: ");
     print_hex(regs.RBP);
-    print_str(" RSP: 0x");
+    print_str(" RSP: ");
     print_hex(regs.RSP);
-    print_str("\nRIP: 0x");
+    print_str("\nRIP: ");
     print_hex(regs.RIP);
-    print_str(" RFLAGS: 0x");
+    print_str(" RFLAGS: ");
     print_hex(regs.RFLAGS);
 }
 
@@ -66,7 +66,7 @@ void kernel_panic(const char* message) {
             break;
         }
         uint64_t return_address = *(rbp + 1);
-        print_str(" 0x");
+        print_str(" ");
         print_hex(return_address);
         print_str("\n");
         rbp = (uint64_t*)(*rbp);

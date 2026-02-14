@@ -1,3 +1,5 @@
+#include "tests/test_idt.h"
+
 void test_divide_by_zero() {
     int a = 1;
     int b = 0;      // Defined variables to shut up GCC warnings for division by 0
@@ -10,13 +12,16 @@ void test_divide_by_zero() {
 void test_function() {}
 
 void test_debug_exception() {
-    // Set a breakpoint at address 0x0 to trigger a debug exception
-    __asm__ volatile(
-        "movq %0, %%dr0\n"
-        "movq %1, %%dr7\n"  // Enable breakpoint 0 (execution)
-        :
-        : "r"(test_function), "r"((unsigned long)0x1));
+    uint64_t dr7 = 0;
+    dr7 |= (1ULL << 0);      // enable DR0 execution breakpoint
 
-    // Now call the function to trigger the breakpoint
-    test_function(); // This should trigger IDT[1] = isr_debug_exception
+    __asm__ volatile(
+        "mov %0, %%dr0\n"
+        "mov %1, %%dr7\n"
+        :
+        : "r"(test_function), "r"(dr7)
+    );
+
+    test_function();  // triggers #DB
 }
+

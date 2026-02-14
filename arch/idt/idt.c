@@ -1,28 +1,68 @@
 #include "arch/idt.h"
 
-// Building the IDT and IDTR structures and their handling, funciton created in isrs.asm
-
-// Single definition lives in arch/idt.c — headers only declare externs
-struct idt_entry idt[256];
-struct idt_ptr idtr;
-
-void idt_attach_handler(int n, void* handler) {
-    uint64_t handler_addr = (uint64_t)handler;
-
-    idt[n].off_low = handler_addr & 0xFFFF;
-    idt[n].selector = 0x08;  // Kernel code segment
-    idt[n].ist = 0;          // No IST
-    idt[n].flags = 0x8E;     // Present, DPL=0, Type=14 (32-bit interrupt gate)
-    idt[n].off_mid = (handler_addr >> 16) & 0xFFFF;
-    idt[n].off_high = (handler_addr >> 32) & 0xFFFFFFFF;
-    idt[n].zero = 0;
+void idt_init() {
+    // Attach the divide by zero handler to interrupt vector 0
+    idt_attach_handler(0, isr_divide_by_zero);
+    // Attach the debug exception handler to interrupt vector 1
+    idt_attach_handler(1, isr_debug_exception);
 }
 
-void idt_load() {
-    idtr.limit = sizeof(idt) - 1;
-    idtr.base = (uint64_t)&idt;
+// IDT[0]
+void divide_by_zero_handler() {
+    kernel_panic("Divide by Zero Exception!");
 
-    // Load into IDTR register the memory address of "idtr"
-    __asm__ volatile("lidt %0" : : "m"(idtr));
+    // Halt the CPU. Ideally we should kill the process if it tried to divide by zero in the kernel space.
+    for (;;) __asm__ volatile("hlt");
 }
 
+// IDT[1]
+void debug_exception_handler(interrupt_frame_t* frame, debug_state_t* state) {
+    uint64_t cause = state->dr6;
+    uint64_t saved_dr7 = 0;
+
+    // Hardware breakpoint?
+    if (cause & 0xF) {
+        print_str("Hardware breakpoint hit\n");
+
+        // Disable local enables temporarily
+        uint64_t original_dr7 = state->dr7;
+        state->dr7 &= ~0xFF;
+
+        // Enable single-step
+        frame->rflags |= (1 << 8);
+
+        // Save original DR7 globally
+        saved_dr7 = original_dr7;
+    } else if (cause & (1 << 14)) {
+        print_str("Single-step trap\n");
+
+        // Clear TF
+        frame->rflags &= ~(1 << 8);
+
+        // Restore breakpoints
+        state->dr7 = saved_dr7;
+    }
+
+    // Print debug register state for diagnostics
+    print_str("Debug Register State:\n");
+    print_str("DR0: ");
+    print_hex(state->dr0);
+    print_str("\n");
+    print_str("DR1: ");
+    print_hex(state->dr1);
+    print_str("\n");
+    print_str("DR2: ");
+    print_hex(state->dr2);
+    print_str("\n");
+    print_str("DR3: ");
+    print_hex(state->dr3);
+    print_str("\n");
+    print_str("DR6: ");
+    print_hex(state->dr6);
+    print_str("\n");
+    print_str("DR7: ");
+    print_hex(state->dr7);
+    print_str("\n");
+
+    state->dr6 = 0;
+}
