@@ -12,5 +12,11 @@ long_mode_start:
     mov fs, ax
     mov gs, ax
 
+    ; Mark this as the bottom of the stack for debuggers
+    xor rbp, rbp
+    push rbp        ; Push null return address (stack bottom marker)
+    push rbp        ; Push null frame pointer
+    mov rbp, rsp    ; Set up frame pointer
+
 	call kernel_main
     hlt

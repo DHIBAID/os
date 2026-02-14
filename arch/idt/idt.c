@@ -5,6 +5,8 @@ void idt_init() {
     idt_attach_handler(0, isr_divide_by_zero);
     // Attach the debug exception handler to interrupt vector 1
     idt_attach_handler(1, isr_debug_exception);
+    // Attach the NMI handler to interrupt vector 2
+    idt_attach_handler(2, isr_nmi_exception);
 }
 
 // IDT[0]
@@ -65,4 +67,12 @@ void debug_exception_handler(interrupt_frame_t* frame, debug_state_t* state) {
     print_str("\n");
 
     state->dr6 = 0;
+}
+
+// IDT[2]
+void nmi_exception_handler(interrupt_frame_t* frame) {
+    kernel_panic("Non-Maskable Interrupt (NMI) Exception!");
+
+    // Halt the CPU
+    for (;;) __asm__ volatile("hlt");
 }

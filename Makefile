@@ -8,18 +8,20 @@ x86_64_object_files := $(x86_64_c_object_files) $(x86_64_asm_object_files)
 
 build/%.o: %.c
 	mkdir -p $(dir $@) && \
-	x86_64-elf-gcc -c -I includes -ffreestanding $< -o $@
+	x86_64-elf-gcc -c -I includes -ffreestanding -O0 -g $< -o $@
 
 $(x86_64_asm_object_files): build/x86_64/%.o : %.asm
 	mkdir -p $(dir $@) && \
-	nasm -f elf64 $< -o $@
+	nasm -f elf64 -g -F dwarf $< -o $@
 
 .PHONY: build-x86_64
 build-x86_64: clean-x86_64 \
 	$(all_object_files) $(x86_64_asm_object_files)
 	mkdir -p dist/x86_64 && \
-	x86_64-elf-ld -n -o dist/x86_64/kernel.bin -T targets/x86_64/linker.ld $(all_object_files) $(x86_64_asm_object_files) && \
-	cp dist/x86_64/kernel.bin targets/x86_64/iso/boot/kernel.bin && \
+	x86_64-elf-ld -n -o dist/x86_64/kernel.elf \
+		-T targets/x86_64/linker.ld \
+		$(all_object_files) $(x86_64_asm_object_files) && \
+	cp dist/x86_64/kernel.elf targets/x86_64/iso/boot/kernel.elf && \
 	grub-mkrescue -o dist/x86_64/kernel.iso targets/x86_64/iso
 
 clean-x86_64:
@@ -99,7 +101,7 @@ disk-clean:
 install-to-disk:
 	@echo "Installing kernel to disk..."
 
-	@if [ ! -f dist/x86_64/kernel.bin ]; then \
+	@if [ ! -f dist/x86_64/kernel.elf ]; then \
 		echo "❌ Kernel not found. Run 'make build-x86_64'"; \
 		exit 1; \
 	fi
@@ -114,7 +116,7 @@ install-to-disk:
 	LOOP=$$($(SUDO) losetup -j $(DISK_IMAGE) | cut -d: -f1); \
 	$(SUDO) mount $${LOOP}p1 $(MOUNT_POINT); \
 	mkdir -p $(MOUNT_POINT)/boot/grub; \
-	$(SUDO) cp dist/x86_64/kernel.bin $(MOUNT_POINT)/boot/kernel.bin; \
+	$(SUDO) cp dist/x86_64/kernel.elf $(MOUNT_POINT)/boot/kernel.elf; \
 	$(SUDO) cp targets/x86_64/grub.cfg $(MOUNT_POINT)/boot/grub/grub.cfg; \
 	sync; \
 	if [ "$(GRUB_INSTALL)" = "true" ]; then \
@@ -135,7 +137,10 @@ install-to-disk:
 
 run:
 	echo "Booting from hard disk..."; \
-	qemu-system-x86_64 -m $(QEMU_MEM) -drive file=$(DISK_IMAGE),format=raw,if=ide; \
+	qemu-system-x86_64 \
+	    -S -s \
+	    -m $(QEMU_MEM) \
+	    -drive file=$(DISK_IMAGE),format=raw,if=ide
 
 
 docker:

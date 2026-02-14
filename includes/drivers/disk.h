@@ -4,6 +4,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "lib/util.h"
+
 // FAT32 Partition Types
 #define FAT32_PARTITION_TYPE_LBA 0x0C
 #define FAT32_PARTITION_TYPE_CHS 0x0B
@@ -189,30 +191,7 @@ extern uint32_t current_dir_cluster;
 extern int fat32_initialized;
 extern char* currentDirectory;
 
-// Helper functions for port I/O
-static inline void outb(uint16_t port, uint8_t val) {
-    __asm__ volatile("outb %0, %1" : : "a"(val), "Nd"(port));
-}
 
-static inline uint8_t inb(uint16_t port) {
-    uint8_t ret;
-    __asm__ volatile("inb %1, %0" : "=a"(ret) : "Nd"(port));
-    return ret;
-}
-
-static inline void outw(uint16_t port, uint16_t val) {
-    __asm__ volatile("outw %0, %1" : : "a"(val), "Nd"(port));
-}
-
-static inline uint16_t inw(uint16_t port) {
-    uint16_t ret;
-    __asm__ volatile("inw %1, %0" : "=a"(ret) : "Nd"(port));
-    return ret;
-}
-
-static inline void insl(uint16_t port, void* addr, uint32_t count) {
-    __asm__ volatile("rep insl" : "+D"(addr), "+c"(count) : "d"(port) : "memory");
-}
 
 // Wait for disk to be ready
 static int ata_wait_bsy() {

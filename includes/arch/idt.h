@@ -54,5 +54,6 @@ void idt_init();
 // Handler definitions from isrs.asm
 void isr_divide_by_zero();
 void isr_debug_exception();
+void isr_nmi_exception();
 
 #endif  // IDT_H

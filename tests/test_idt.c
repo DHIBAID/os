@@ -25,3 +25,9 @@ void test_debug_exception() {
     test_function();  // triggers #DB
 }
 
+void test_nmi_exception() {
+    // Modern x86 systems don't allow software to trigger NMIs directly, so we can't test this in a user-space test.
+    // However, we can at least verify that the NMI handler is correctly registered in the IDT by checking the IDT entries in the kernel code.
+    // If using a virtual machine, you can configure the VM to trigger an NMI.
+    // For QEMU, you can use the QEMU monitor command: `nmi` to trigger an NMI and observe the kernel's response.
+}

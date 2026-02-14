@@ -45,7 +45,7 @@ void kernel_main() {
     print_str("Welcome to our 64-bit kernel!\n");
 
     // Call test functions below this line (if any) ------------------------
-    test_debug_exception();
+    // ------------------------
 
     print_str(strconcat(currentDirectory, ">: "));
 

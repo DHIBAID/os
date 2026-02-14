@@ -57,18 +57,24 @@ void kernel_panic(const char* message) {
     read_registers();
 
     print_str("\nStack trace:\n");
-    
+
     // Walk the stack using RBP and print return addresses
     uint64_t* rbp;
     __asm__ volatile("mov %%rbp, %0" : "=r"(rbp));
+
     for (int i = 0; i < 10; i++) {
-        if (rbp == NULL || *rbp == 0) {
+        if (!rbp || !*rbp)
             break;
-        }
+
         uint64_t return_address = *(rbp + 1);
+
+        // Adjust to get call site instead of return site
+        uint64_t call_site = return_address - 1;
+
         print_str(" ");
-        print_hex(return_address);
+        print_hex(call_site);
         print_str("\n");
+
         rbp = (uint64_t*)(*rbp);
     }
 }

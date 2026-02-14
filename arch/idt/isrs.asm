@@ -110,3 +110,67 @@ isr_debug_exception:
 
     iretq
 
+; ISR2: Non-Maskable Interrupt (NMI) Exception
+extern nmi_exception_handler
+global isr_nmi_exception
+
+isr_nmi_exception:
+
+    ; CPU has pushed (ring0 case):
+    ;   RIP
+    ;   CS
+    ;   RFLAGS
+
+    ; --- Establish a proper frame ---
+    push rbp
+    mov rbp, rsp
+
+    ; --- Save all general purpose registers ---
+    push rax
+    push rbx
+    push rcx
+    push rdx
+    push rsi
+    push rdi
+    push r8
+    push r9
+    push r10
+    push r11
+    push r12
+    push r13
+    push r14
+    push r15
+
+    ; Stack alignment:
+    ;
+    ; CPU push: 24 bytes
+    ; push rbp: 8 bytes
+    ; 14 GPRs: 112 bytes
+    ;
+    ; Total = 24 + 8 + 112 = 144 bytes
+    ; 144 % 16 = 0 → aligned
+
+    ; Pass pointer to saved registers (top of stack)
+    mov rdi, rsp
+    call nmi_exception_handler
+
+    ; --- Restore registers in reverse order ---
+    pop r15
+    pop r14
+    pop r13
+    pop r12
+    pop r11
+    pop r10
+    pop r9
+    pop r8
+    pop rdi
+    pop rsi
+    pop rdx
+    pop rcx
+    pop rbx
+    pop rax
+
+    ; --- Restore frame ---
+    pop rbp
+
+    iretq
