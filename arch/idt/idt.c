@@ -1,4 +1,5 @@
 #include "arch/idt.h"
+
 #include "lib/string.h"
 
 #define DF_IST_INDEX 1
@@ -91,7 +92,8 @@ void nmi_exception_handler(interrupt_frame_t* frame) {
 void double_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
     (void)frame;
 
-    kernel_panic(strconcat("Double Fault Exception!\n Error code: ", error_code));
+    char hex_buf[19];  // "0x" + 16 hex digits + '\0'
+    kernel_panic(strconcat("Double Fault Exception!\nError code: ", u64_to_hex(error_code, hex_buf)));
 
     for (;;) __asm__ volatile("hlt");
 }
@@ -100,7 +102,8 @@ void double_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
 void general_protection_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
     (void)frame;
 
-    kernel_panic(strconcat("General Protection Fault Exception!\n Error code: ", error_code));
+    char hex_buf[19];  // "0x" + 16 hex digits + '\0'
+    kernel_panic(strconcat("General Protection Fault Exception!\nError code: ", u64_to_hex(error_code, hex_buf)));
 
     for (;;) __asm__ volatile("hlt");
 }
@@ -109,7 +112,8 @@ void general_protection_fault_handler(interrupt_frame_t* frame, uint64_t error_c
 void page_fault_handler(interrupt_frame_t* frame, uint64_t error_code, uint64_t cr2) {
     (void)frame;
 
-    kernel_panic(strconcat("Page Fault Exception!\n Error code: ", error_code));
+    char hex_buf[19];  // "0x" + 16 hex digits + '\0'
+    kernel_panic(strconcat("Page Fault Exception!\nError code: ", u64_to_hex(error_code, hex_buf)));
 
     for (;;) __asm__ volatile("hlt");
 }

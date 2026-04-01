@@ -11,3 +11,4 @@ char* strconcat(const char* str1, const char* str2);
 size_t strlen(const char* str);
 char* strcpy(char* dest, const char* src);
 char* strcat(char* dest, const char* src);
+char* u64_to_hex(uint64_t value, char* buf);

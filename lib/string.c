@@ -76,3 +76,14 @@ char* strcat(char* dest, const char* src) {
     *dest = '\0';
     return orig_dest;
 }
+
+char* u64_to_hex(uint64_t value, char* buf) {
+    // buf must be at least 19 bytes ("0x" + 16 hex digits + '\0')
+    const char* digits = "0123456789ABCDEF";
+    buf[0] = '0';
+    buf[1] = 'x';
+    for (int i = 0; i < 16; i++)
+        buf[2 + i] = digits[(value >> (60 - i * 4)) & 0xF];
+    buf[18] = '\0';
+    return buf;
+}
