@@ -7,6 +7,11 @@ static void* heap_current = 0;           // Current position in heap
 static void* heap_start = 0;             // Start of heap
 static size_t total_heap_allocated = 0;  // Total bytes allocated
 
+// PMM globals defined in header for external access
+uint64_t* pmm_bitmap = 0;
+uint64_t pmm_total_frames = 0;
+uint64_t pmm_free_frames = 0;
+
 void pmm_init(uint64_t mem_size, uint64_t* bitmap) {
     pmm_bitmap = bitmap;
     pmm_total_frames = mem_size / FRAME_SIZE;

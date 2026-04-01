@@ -1,6 +1,7 @@
 #include "kernel/terminal.h"
 
-char* inp;
+static char input_buffer[256]; // TODO: limited to 256 chars, extend in future for features like piping.
+char* inp = input_buffer;
 int len = 0;
 
 void update_input(char c) {
@@ -24,7 +25,7 @@ void update_input(char c) {
         *(inp + len) = c;
         len++;
         *(inp + len) = '\0';
-    }  // solf lock to prevent buffer overflow
+    }  // soft lock to prevent buffer overflow
 }
 
 void parse_command(char* command) {

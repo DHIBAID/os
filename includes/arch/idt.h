@@ -23,6 +23,13 @@ typedef struct interrupt_frame {
     uint64_t rflags;
 } interrupt_frame_t;
 
+typedef struct interrupt_error_frame {
+    uint64_t error_code;
+    uint64_t rip;
+    uint64_t cs;
+    uint64_t rflags;
+} interrupt_error_frame_t;
+
 struct idt_entry {
     uint16_t off_low;
     uint16_t selector;
@@ -44,6 +51,7 @@ extern struct idt_ptr idtr;
 
 // Attach an interrupt handler to the IDT
 void idt_attach_handler(int n, void* handler);
+void idt_attach_handler_ist(int n, void* handler, uint8_t ist_index);
 
 // Load the IDT into the CPU
 void idt_load();
@@ -51,9 +59,15 @@ void idt_load();
 // Initialize the IDT with default handlers
 void idt_init();
 
+// Setup a runtime GDT/TSS and load TR so IST entries are valid.
+void gdt_tss_init();
+
 // Handler definitions from isrs.asm
 void isr_divide_by_zero();
 void isr_debug_exception();
 void isr_nmi_exception();
+void isr_double_fault();
+void isr_general_protection_fault();
+void isr_page_fault();
 
 #endif  // IDT_H

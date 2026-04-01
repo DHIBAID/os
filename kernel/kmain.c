@@ -1,7 +1,7 @@
 #include "kernel/kernel.h"
 
 // Global variable definition
-char* currentDirectory = "/";
+char currentDirectory[256] = "/";
 
 // Example memory initialization function
 void init_memory_management() {
@@ -27,6 +27,9 @@ int init_fat32() {
 }
 
 void kernel_main() {
+    // Setup runtime GDT/TSS so IST-based exception handlers are valid.
+    gdt_tss_init();
+
     // Setup IDTR and IDT
     idt_init();
     idt_load();
@@ -45,6 +48,8 @@ void kernel_main() {
     print_str("Welcome to our 64-bit kernel!\n");
 
     // Call test functions below this line (if any) ------------------------
+    // test_page_fault();
+    test_double_fault();
     // ------------------------
 
     print_str(strconcat(currentDirectory, ">: "));

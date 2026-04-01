@@ -1,5 +1,7 @@
 #include "arch/idt.h"
 
+#define DF_IST_INDEX 1
+
 void idt_init() {
     // Attach the divide by zero handler to interrupt vector 0
     idt_attach_handler(0, isr_divide_by_zero);
@@ -7,6 +9,12 @@ void idt_init() {
     idt_attach_handler(1, isr_debug_exception);
     // Attach the NMI handler to interrupt vector 2
     idt_attach_handler(2, isr_nmi_exception);
+    // Attach the Double Fault handler to interrupt vector 8 with dedicated IST.
+    idt_attach_handler_ist(8, isr_double_fault, DF_IST_INDEX);
+    // Attach the General Protection Fault handler to interrupt vector 13.
+    idt_attach_handler(13, isr_general_protection_fault);
+    // Attach the Page Fault handler to interrupt vector 14.
+    idt_attach_handler(14, isr_page_fault);
 }
 
 // IDT[0]
@@ -71,8 +79,44 @@ void debug_exception_handler(interrupt_frame_t* frame, debug_state_t* state) {
 
 // IDT[2]
 void nmi_exception_handler(interrupt_frame_t* frame) {
+    (void)frame;
     kernel_panic("Non-Maskable Interrupt (NMI) Exception!");
 
     // Halt the CPU
+    for (;;) __asm__ volatile("hlt");
+}
+
+// IDT[8]
+void double_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
+    (void)frame;
+    print_str("Double Fault (#DF) error code: ");
+    print_hex(error_code);
+    print_str("\n");
+    kernel_panic("Double Fault Exception!");
+
+    for (;;) __asm__ volatile("hlt");
+}
+
+// IDT[13]
+void general_protection_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
+    (void)frame;
+    print_str("General Protection Fault (#GP) error code: ");
+    print_hex(error_code);
+    print_str("\n");
+    kernel_panic("General Protection Fault Exception!");
+
+    for (;;) __asm__ volatile("hlt");
+}
+
+// IDT[14]
+void page_fault_handler(interrupt_frame_t* frame, uint64_t error_code, uint64_t cr2) {
+    (void)frame;
+    print_str("Page Fault (#PF) error code: ");
+    print_hex(error_code);
+    print_str("\nFault address (CR2): ");
+    print_hex(cr2);
+    print_str("\n");
+    kernel_panic("Page Fault Exception!");
+
     for (;;) __asm__ volatile("hlt");
 }

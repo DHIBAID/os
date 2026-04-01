@@ -27,8 +27,8 @@ void meminfo();
 #define FRAME_SIZE 4096  // 4 KiB frames
 #define BITMAP_BITS_PER_BYTE 8
 
-static uint64_t* pmm_bitmap = 0;       // Bitmap to track frame allocation
-static uint64_t pmm_total_frames = 0;  // Total number of frames
-static uint64_t pmm_free_frames = 0;   // Number of free frames
+extern uint64_t* pmm_bitmap;       // Bitmap to track frame allocation
+extern uint64_t pmm_total_frames;  // Total number of frames
+extern uint64_t pmm_free_frames;   // Number of free frames
 
 #endif  // MEMORY_H

@@ -16,7 +16,7 @@
 void update_input(char c);
 void parse_command(char* command);
 
-extern char* currentDirectory;
+extern char currentDirectory[256];
 extern FAT32_Info global_fat32;
 extern uint32_t current_dir_cluster;
 extern int fat32_initialized;

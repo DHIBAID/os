@@ -27,7 +27,7 @@ build-x86_64: clean-x86_64 \
 clean-x86_64:
 	$(SUDO) rm -rf build/*
 	$(SUDO) rm -rf dist/x86_64
-	$(SUDO) rm -rf targets/x86_64/iso/boot/kernel.bin
+	$(SUDO) rm -rf targets/x86_64/iso/boot/kernel.elf
 
 DISK_IMAGE := disk.img
 MOUNT_POINT := mnt

@@ -10,9 +10,8 @@
 #include "lib/printf.h"
 #include "lib/string.h"
 #include "lib/util.h"
-
 #include "tests/test_idt.h"  // Include test headers as needed
 
-extern char* currentDirectory;
+extern char currentDirectory[256];
 
 #endif  // KERNEL_H

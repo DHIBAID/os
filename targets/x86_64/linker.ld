@@ -13,4 +13,23 @@ SECTIONS
   {
     *(.text)
   }
+
+  .rodata :
+  {
+    *(.rodata*)
+  }
+
+  .data :
+  {
+    *(.data*)
+  }
+
+  .bss :
+  {
+    *(COMMON)
+    *(.bss*)
+    . = ALIGN(16);
+  }
+
+  kernel_end = .;
 }

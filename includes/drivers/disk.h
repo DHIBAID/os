@@ -189,9 +189,7 @@ int fat32_find_file_in_cluster(FAT32_Info* info, uint32_t cluster, const char* f
 extern FAT32_Info global_fat32;
 extern uint32_t current_dir_cluster;
 extern int fat32_initialized;
-extern char* currentDirectory;
-
-
+extern char currentDirectory[256];
 
 // Wait for disk to be ready
 static int ata_wait_bsy() {

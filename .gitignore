@@ -3,3 +3,4 @@ dist/
 build/
 disk.img
 mnt/
+tmp/

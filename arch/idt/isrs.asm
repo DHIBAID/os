@@ -174,3 +174,49 @@ isr_nmi_exception:
     pop rbp
 
     iretq
+
+; ISR8: Double Fault Exception (with error code)
+extern double_fault_handler
+global isr_double_fault
+
+isr_double_fault:
+    ; CPU pushed error_code, RIP, CS, RFLAGS.
+    mov rdi, rsp
+    mov rsi, [rsp]
+
+    ; Pass interrupt_frame_t* as first arg
+    add rdi, 8
+
+    call double_fault_handler
+    iretq
+
+; ISR13: General Protection Fault Exception (with error code)
+extern general_protection_fault_handler
+global isr_general_protection_fault
+
+isr_general_protection_fault:
+    ; CPU pushed error_code, RIP, CS, RFLAGS.
+    mov rdi, rsp
+    mov rsi, [rsp]
+
+    ; Pass interrupt_frame_t* as first arg
+    add rdi, 8
+
+    call general_protection_fault_handler
+    iretq
+
+; ISR14: Page Fault Exception (with error code)
+extern page_fault_handler
+global isr_page_fault
+
+isr_page_fault:
+    ; CPU pushed error_code, RIP, CS, RFLAGS.
+    mov rdi, rsp
+    mov rsi, [rsp]
+    mov rdx, cr2
+
+    ; Pass interrupt_frame_t* as first arg
+    add rdi, 8
+
+    call page_fault_handler
+    iretq
