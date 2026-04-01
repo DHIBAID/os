@@ -1,4 +1,5 @@
 #include "arch/idt.h"
+#include "lib/string.h"
 
 #define DF_IST_INDEX 1
 
@@ -89,10 +90,8 @@ void nmi_exception_handler(interrupt_frame_t* frame) {
 // IDT[8]
 void double_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
     (void)frame;
-    print_str("Double Fault (#DF) error code: ");
-    print_hex(error_code);
-    print_str("\n");
-    kernel_panic("Double Fault Exception!");
+
+    kernel_panic(strconcat("Double Fault Exception!\n Error code: ", error_code));
 
     for (;;) __asm__ volatile("hlt");
 }
@@ -100,10 +99,8 @@ void double_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
 // IDT[13]
 void general_protection_fault_handler(interrupt_frame_t* frame, uint64_t error_code) {
     (void)frame;
-    print_str("General Protection Fault (#GP) error code: ");
-    print_hex(error_code);
-    print_str("\n");
-    kernel_panic("General Protection Fault Exception!");
+
+    kernel_panic(strconcat("General Protection Fault Exception!\n Error code: ", error_code));
 
     for (;;) __asm__ volatile("hlt");
 }
@@ -111,12 +108,8 @@ void general_protection_fault_handler(interrupt_frame_t* frame, uint64_t error_c
 // IDT[14]
 void page_fault_handler(interrupt_frame_t* frame, uint64_t error_code, uint64_t cr2) {
     (void)frame;
-    print_str("Page Fault (#PF) error code: ");
-    print_hex(error_code);
-    print_str("\nFault address (CR2): ");
-    print_hex(cr2);
-    print_str("\n");
-    kernel_panic("Page Fault Exception!");
+
+    kernel_panic(strconcat("Page Fault Exception!\n Error code: ", error_code));
 
     for (;;) __asm__ volatile("hlt");
 }
