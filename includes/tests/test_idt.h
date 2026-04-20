@@ -14,4 +14,4 @@ void test_general_protection_fault();
 void test_page_fault();
 void test_double_fault();
 
-#endif  // TEST_IDT_H
+#endif	// TEST_IDT_H

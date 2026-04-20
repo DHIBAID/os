@@ -41,7 +41,7 @@ else
 SUDO := sudo
 endif
 
-.PHONY: disk-create disk-mount disk-unmount disk-add-files disk-list disk-inspect disk-clean install-to-disk run docker
+.PHONY: disk-create disk-mount disk-unmount disk-add-files disk-list disk-inspect disk-clean install-to-disk run docker docker-build
 
 disk-create:
 	@echo "Creating $(DISK_SIZE_MB)MB disk image..."
@@ -124,7 +124,7 @@ install-to-disk:
 		$(SUDO) grub-install \
 			--target=i386-pc \
 			--boot-directory=$(MOUNT_POINT)/boot \
-			--modules="part_msdos fat multiboot2" \
+			--modules="part_msdos fat multiboot2 vbe all_video gfxterm" \
 			--no-floppy \
 			--recheck \
 			$${LOOP}; \
@@ -140,8 +140,12 @@ run:
 	qemu-system-x86_64 \
 	    -S -s \
 	    -m $(QEMU_MEM) \
+	    -vga std \
 	    -drive file=$(DISK_IMAGE),format=raw,if=ide
 
 
-docker:
-	$(SUDO) docker run --rm -it -v "$(PWD)":/root/env/ os-buildenv
+docker-build:
+	$(SUDO) docker build -t os-buildenv buildenv
+
+docker: docker-build
+	$(SUDO) docker run --rm -it -v "$(CURDIR)":/root/env/:Z os-buildenv

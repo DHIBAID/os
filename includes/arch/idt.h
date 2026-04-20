@@ -9,45 +9,51 @@
 #include "lib/printf.h"
 
 typedef struct debug_state {
-    uint64_t dr0;
-    uint64_t dr1;
-    uint64_t dr2;
-    uint64_t dr3;
-    uint64_t dr6;
-    uint64_t dr7;
+	uint64_t dr0;
+	uint64_t dr1;
+	uint64_t dr2;
+	uint64_t dr3;
+	uint64_t dr6;
+	uint64_t dr7;
 } debug_state_t;
 
 typedef struct interrupt_frame {
-    uint64_t rip;
-    uint64_t cs;
-    uint64_t rflags;
+	uint64_t rip;
+	uint64_t cs;
+	uint64_t rflags;
 } interrupt_frame_t;
 
 typedef struct interrupt_error_frame {
-    uint64_t error_code;
-    uint64_t rip;
-    uint64_t cs;
-    uint64_t rflags;
+	uint64_t error_code;
+	uint64_t rip;
+	uint64_t cs;
+	uint64_t rflags;
 } interrupt_error_frame_t;
 
 struct idt_entry {
-    uint16_t off_low;
-    uint16_t selector;
-    uint8_t ist;
-    uint8_t flags;
-    uint16_t off_mid;
-    uint32_t off_high;
-    uint32_t zero;
+	uint16_t off_low;
+	uint16_t selector;
+	uint8_t ist;
+	uint8_t flags;
+	uint16_t off_mid;
+	uint32_t off_high;
+	uint32_t zero;
 } __attribute__((packed));
 
 // The register structure for loading the IDT
 struct idt_ptr {
-    uint16_t limit;
-    uint64_t base;
+	uint16_t limit;
+	uint64_t base;
 } __attribute__((packed));
 
 extern struct idt_entry idt[256];
 extern struct idt_ptr idtr;
+
+#define GDT_SELECTOR_KERNEL_CODE 0x08
+#define GDT_SELECTOR_KERNEL_DATA 0x10
+#define GDT_SELECTOR_USER_DATA 0x18
+#define GDT_SELECTOR_USER_CODE 0x20
+#define GDT_SELECTOR_TSS 0x28
 
 // Attach an interrupt handler to the IDT
 void idt_attach_handler(int n, void* handler);
@@ -61,6 +67,10 @@ void idt_init();
 
 // Setup a runtime GDT/TSS and load TR so IST entries are valid.
 void gdt_tss_init();
+uint16_t gdt_kernel_code_selector(void);
+uint16_t gdt_kernel_data_selector(void);
+uint16_t gdt_user_code_selector(void);
+uint16_t gdt_user_data_selector(void);
 
 // Handler definitions from isrs.asm
 void isr_divide_by_zero();
@@ -70,4 +80,4 @@ void isr_double_fault();
 void isr_general_protection_fault();
 void isr_page_fault();
 
-#endif  // IDT_H
+#endif	// IDT_H

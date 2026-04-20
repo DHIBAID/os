@@ -8,97 +8,97 @@ size_t row = 0;
 static uint8_t color = PRINT_COLOR_WHITE | (PRINT_COLOR_BLACK << 4);
 
 void clear_row(size_t row) {
-    for (size_t col = 0; col < VGA_WIDTH; col++) {
-        put_char_at(' ', col, row, color);
-    }
+	for (size_t col = 0; col < VGA_WIDTH; col++) {
+		put_char_at(' ', col, row, color);
+	}
 }
 
 void print_clear() {
-    for (size_t i = 0; i < VGA_HEIGHT; i++) {
-        clear_row(i);
-    }
-    col = 0;
-    row = 0;
+	for (size_t i = 0; i < VGA_HEIGHT; i++) {
+		clear_row(i);
+	}
+	col = 0;
+	row = 0;
 }
 
 void print_newline() {
-    col = 0;
+	col = 0;
 
-    if (row < VGA_HEIGHT - 1) {
-        row++;
-        return;
-    }
+	if (row < VGA_HEIGHT - 1) {
+		row++;
+		return;
+	}
 
-    scroll_screen();
-    row = VGA_HEIGHT - 1;
+	scroll_screen();
+	row = VGA_HEIGHT - 1;
 }
 
 void print_char(char character) {
-    if (character == '\n') {
-        print_newline();
-        return;
-    }
+	if (character == '\n') {
+		print_newline();
+		return;
+	}
 
-    if (col >= VGA_WIDTH) {
-        print_newline();
-    }
+	if (col >= VGA_WIDTH) {
+		print_newline();
+	}
 
-    put_char_at(character, col, row, color);
-    col++;
+	put_char_at(character, col, row, color);
+	col++;
 }
 
 void print_str(const char* str) {
-    for (size_t i = 0; str[i] != '\0'; i++) {
-        print_char(str[i]);
-    }
+	for (size_t i = 0; str[i] != '\0'; i++) {
+		print_char(str[i]);
+	}
 }
 
 void print_set_color(uint8_t foreground, uint8_t background) {
-    color = foreground | (background << 4);
+	color = foreground | (background << 4);
 }
 
 void print_dec(uint64_t num) {
-    if (num == 0) {
-        print_char('0');
-        return;
-    }
+	if (num == 0) {
+		print_char('0');
+		return;
+	}
 
-    char buffer[20];
-    int i = 0;
+	char buffer[20];
+	int i = 0;
 
-    while (num > 0) {
-        buffer[i++] = '0' + (num % 10);
-        num /= 10;
-    }
+	while (num > 0) {
+		buffer[i++] = '0' + (num % 10);
+		num /= 10;
+	}
 
-    // Print the digits in reverse order
-    for (int j = i - 1; j >= 0; j--) {
-        print_char(buffer[j]);
-    }
+	// Print the digits in reverse order
+	for (int j = i - 1; j >= 0; j--) {
+		print_char(buffer[j]);
+	}
 }
 
 void print_hex(uint64_t num) {
-    print_str("0x");
-    if (num == 0) {
-        print_char('0');
-        return;
-    }
+	print_str("0x");
+	if (num == 0) {
+		print_char('0');
+		return;
+	}
 
-    char buffer[16];
-    int i = 0;
+	char buffer[16];
+	int i = 0;
 
-    while (num > 0) {
-        uint8_t digit = num & 0xF;
-        if (digit < 10) {
-            buffer[i++] = '0' + digit;
-        } else {
-            buffer[i++] = 'A' + (digit - 10);
-        }
-        num >>= 4;
-    }
+	while (num > 0) {
+		uint8_t digit = num & 0xF;
+		if (digit < 10) {
+			buffer[i++] = '0' + digit;
+		} else {
+			buffer[i++] = 'A' + (digit - 10);
+		}
+		num >>= 4;
+	}
 
-    // Print the digits in reverse order
-    for (int j = i - 1; j >= 0; j--) {
-        print_char(buffer[j]);
-    }
+	// Print the digits in reverse order
+	for (int j = i - 1; j >= 0; j--) {
+		print_char(buffer[j]);
+	}
 }

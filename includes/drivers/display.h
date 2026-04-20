@@ -15,4 +15,4 @@ void scroll_screen();
 void put_char_at(char c, size_t x, size_t y, uint8_t color);
 void remove_char_at_cursor();
 
-#endif  // DISPLAY_H
+#endif	// DISPLAY_H

@@ -4,3 +4,4 @@ build/
 disk.img
 mnt/
 tmp/
+/*.md

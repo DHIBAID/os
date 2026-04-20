@@ -15,4 +15,4 @@ char bios_get_char();
 char read_from_usb_keyboard();
 int is_backspace(char c);
 
-#endif  // KEYBOARD_H
+#endif	// KEYBOARD_H

@@ -21,4 +21,4 @@ extern FAT32_Info global_fat32;
 extern uint32_t current_dir_cluster;
 extern int fat32_initialized;
 
-#endif  // KERNEL_TERMINAL_H
+#endif	// KERNEL_TERMINAL_H
